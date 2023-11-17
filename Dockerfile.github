@@ -40,7 +40,7 @@ RUN wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor 
 RUN apt-get update && \
     apt-get install azure-functions-core-tools-4
 
-COPY ./entrypoint.sh ./entrypoint.sh
+COPY github-actions-runner/entrypoint.sh ./entrypoint.sh
 RUN chmod +x ./entrypoint.sh
 
 USER runner
