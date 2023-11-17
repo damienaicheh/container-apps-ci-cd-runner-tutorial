@@ -40,6 +40,14 @@ RUN wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor 
 RUN apt-get update && \
     apt-get install azure-functions-core-tools-4
 
+ENV DOTNET_ROOT=/usr/share/dotnet
+ENV PATH=$PATH:usr/share/dotnet
+ENV DOTNET_SDK_MAJOR_VERSION=7.0
+
+RUN wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh \
+    && chmod +x ./dotnet-install.sh \
+    && ./dotnet-install.sh --channel $DOTNET_SDK_MAJOR_VERSION --install-dir $DOTNET_ROOT 
+
 COPY github-actions-runner/entrypoint.sh ./entrypoint.sh
 RUN chmod +x ./entrypoint.sh
 
