@@ -1,18 +1,46 @@
-FROM ghcr.io/actions/actions-runner:2.311.0
+FROM ghcr.io/actions/actions-runner:2.304.0
 
 USER root
 
-# install curl, azure cli and jq
-RUN apt-get update && \
-    apt-get install -y curl jq ca-certificates curl apt-transport-https lsb-release gnupg && \
-    curl -sL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | tee /etc/apt/trusted.gpg.d/microsoft.gpg > /dev/null && \
-    echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/azure-cli.list && \
-    apt-get update && \
-    apt-get install -y azure-cli \
+# install curl and jq
+RUN apt-get update && apt-get install -y curl jq && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-COPY github-actions-runner/entrypoint.sh ./entrypoint.sh
+# Installer les dépendances nécessaires
+RUN apt-get update && \
+    apt-get install ca-certificates curl apt-transport-https lsb-release gnupg -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Obtenir les clés de signature de Microsoft
+RUN curl -sL https://packages.microsoft.com/keys/microsoft.asc | \
+    gpg --dearmor | \
+    tee /etc/apt/trusted.gpg.d/microsoft.gpg > /dev/null
+
+# Installer Azure CLI
+RUN echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $(lsb_release -cs) main" | \
+    tee /etc/apt/sources.list.d/azure-cli.list
+
+RUN apt-get update && \
+    apt-get install azure-cli
+
+RUN apt-get update && \
+    apt-get install -y wget unzip
+
+# Get Microsoft signing key
+RUN wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.asc.gpg && \
+    mv microsoft.asc.gpg /etc/apt/trusted.gpg.d/ && \
+    wget -q https://packages.microsoft.com/config/debian/9/prod.list && \
+    mv prod.list /etc/apt/sources.list.d/microsoft-prod.list && \
+    chown root:root /etc/apt/trusted.gpg.d/microsoft.asc.gpg && \
+    chown root:root /etc/apt/sources.list.d/microsoft-prod.list
+
+# Install Azure Functions Core Tools
+RUN apt-get update && \
+    apt-get install azure-functions-core-tools-4
+
+COPY ./entrypoint.sh ./entrypoint.sh
 RUN chmod +x ./entrypoint.sh
 
 USER runner
