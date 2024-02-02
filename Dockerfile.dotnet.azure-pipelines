@@ -13,20 +13,13 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommend
     lsb-release \
     software-properties-common \
     zip \
-    python3 \
-    python3-pip \
     wget
 
-# Install terraform
-RUN wget https://releases.hashicorp.com/terraform/1.6.4/terraform_1.6.4_linux_amd64.zip \
-    && unzip terraform_1.6.4_linux_amd64.zip \
-    && mv terraform /usr/local/bin/ \
-    && rm terraform_1.6.4_linux_amd64.zip
-    
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg && \
     mv microsoft.gpg /etc/apt/trusted.gpg.d/microsoft.gpg && \
     sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-ubuntu-$(lsb_release -cs)-prod $(lsb_release -cs) main" > /etc/apt/sources.list.d/dotnetdev.list'
 
+# Azure CLI
 RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash
 
 RUN wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb && \
@@ -35,6 +28,7 @@ RUN wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-p
     apt-get update && \
     apt-get install -y dotnet-sdk-7.0
 
+# Azure Functions Core Tools
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg && \
     mv microsoft.gpg /etc/apt/trusted.gpg.d/microsoft.gpg && \
     sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-ubuntu-$(lsb_release -cs)-prod $(lsb_release -cs) main" > /etc/apt/sources.list.d/dotnetdev.list' $$ \

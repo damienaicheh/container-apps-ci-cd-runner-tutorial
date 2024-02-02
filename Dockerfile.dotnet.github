@@ -8,12 +8,6 @@ RUN apt-get update && apt-get install -y curl jq  wget unzip ca-certificates cur
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Install terraform
-RUN wget https://releases.hashicorp.com/terraform/1.6.4/terraform_1.6.4_linux_amd64.zip \
-    && unzip terraform_1.6.4_linux_amd64.zip \
-    && mv terraform /usr/local/bin/ \
-    && rm terraform_1.6.4_linux_amd64.zip
-
 # Obtenir les clés de signature de Microsoft
 RUN curl -sL https://packages.microsoft.com/keys/microsoft.asc | \
     gpg --dearmor | \
@@ -25,9 +19,6 @@ RUN echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $(lsb
 
 RUN apt-get update && \
     apt-get install azure-cli
-
-RUN apt-get update && \
-    apt-get install -y wget unzip
 
 # Get Microsoft signing key
 RUN wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.asc.gpg && \
