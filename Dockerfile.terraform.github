@@ -8,6 +8,11 @@ RUN apt-get update && apt-get install -y curl jq  wget unzip ca-certificates cur
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+# Microsoft signing key
+RUN curl -sL https://packages.microsoft.com/keys/microsoft.asc | \
+    gpg --dearmor | \
+    tee /etc/apt/trusted.gpg.d/microsoft.gpg > /dev/null
+
 # Install terraform
 RUN wget https://releases.hashicorp.com/terraform/1.6.4/terraform_1.6.4_linux_amd64.zip \
     && unzip terraform_1.6.4_linux_amd64.zip \
